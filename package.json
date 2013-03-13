@@ -1,0 +1,23 @@
+{
+    "name" : "ants",
+    "description" : "an exploration into flow based programming",
+    "main" : "package.js",
+    "author" :
+    {
+        "name" : "Patrick Sexton",
+        "email" : "onethreelabs@gmail.com",
+        "url" : "http://www.onethreelabs.com"
+    },
+    "version" : "0.0.1",
+    "repository" :
+    {
+        "type" : "git",
+        "url" : "https://github.com/onethreelabs/ants.git"
+    },
+    "devDependencies":
+    {
+        "mocha": "~1.7.4",
+        "should": "~1.2.1",
+        "node-uuid": "~1.4"
+    }
+}
