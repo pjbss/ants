@@ -14,10 +14,13 @@
         "type" : "git",
         "url" : "https://github.com/onethreelabs/ants.git"
     },
+    "dependencies":
+    {
+        "amdefine": ">=0.0.2"
+    },
     "devDependencies":
     {
         "mocha": "~1.7.4",
-        "should": "~1.2.1",
-        "node-uuid": "~1.4"
+        "should": "~1.2.1"
     }
 }
