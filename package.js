@@ -1,1 +1,1 @@
-module.exports = require('./lib/ants');
+module.exports = require('./lib/AntFarm');

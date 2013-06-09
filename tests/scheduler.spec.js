@@ -35,7 +35,6 @@ describe('A Scheduler', function(){
     });
 
     it('should wait to call a node until all inputs are ready', function(done){
-        var result = '';
         var fastNode = function(packet){
             return packet;
         };
@@ -49,7 +48,7 @@ describe('A Scheduler', function(){
             return val;
         };
         var lastNode = function(one, two){
-            result = one + ' ' + two;
+            var result = one + ' ' + two;
             return result;
         };
 
@@ -65,12 +64,71 @@ describe('A Scheduler', function(){
         nodeRepo.add('c', 0, slowNode);
         nodeRepo.add('x', 0, lastNode);
 
-        scheduler.sendPacket('test', 0, function(){
-            result.should.equal('1000000 test');
+        scheduler.sendPacket('test', 0, function(packet){
+            packet.should.equal('1000000 test');
             done();
         }, {});
     });
 
+    it('should be able to get the active versions', function(done){
+        var killIt = false;
+        var fastNode = function(packet){
+            return packet;
+        };
+        var increment = function(){
+            if(killIt) return;
+
+            process.nextTick(increment);
+        };
+        var slowNode = function(packet){
+            increment();
+        };
+        var lastNode = function(one, two){
+            var result = one + ' ' + two;
+            return result;
+        };
+
+        var graph = new DAG();
+        graph.connect('a', 'b');
+        graph.connect('a', 'c');
+        graph.connect('c', 'x');
+        graph.connect('b', 'x');
+        dagRepo.add('graph', 0, graph);
+
+        var graph = new DAG();
+        graph.connect('a', 'b');
+        graph.connect('a', 'c');
+        graph.connect('c', 'x');
+        graph.connect('b', 'x');
+        dagRepo.add('graph', 1, graph);
+
+        nodeRepo.add('a', 0, fastNode);
+        nodeRepo.add('b', 0, fastNode);
+        nodeRepo.add('c', 0, slowNode);
+        nodeRepo.add('x', 0, lastNode);
+
+        nodeRepo.add('a', 1, fastNode);
+        nodeRepo.add('b', 1, fastNode);
+        nodeRepo.add('c', 1, slowNode);
+        nodeRepo.add('x', 1, lastNode);
+
+        scheduler.sendPacket('test', 0, function(result){
+            return;
+        }, {});
+
+        scheduler.activeVersions().length.should.equal(1);
+        scheduler.activeVersions().should.include('0');
+
+        scheduler.sendPacket('test', 1, function(result){
+            done();
+        }, {});
+
+        scheduler.activeVersions().length.should.equal(2);
+        scheduler.activeVersions().should.include('0');
+        scheduler.activeVersions().should.include('1');
+
+        killIt = true;
+    });
 
     var nodeRepo;
     var dagRepo;

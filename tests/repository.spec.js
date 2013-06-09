@@ -52,6 +52,61 @@ describe('A Repository', function(){
         versions.should.include('1');
     });
 
+    it('should be able to clone an existing version into a new version', function(){
+        repo.add('key', 0, 'test');
+        repo.add(165, 0, 'test');
+        repo.add('party', 0, 'test one');
+        repo.add('brass monkey', 0, 'test one');
+
+        repo.cloneVersionToVersion(0,13);
+
+        var versions = repo.getVersions();
+        versions.should.include('0');
+        versions.should.include('13');
+    });
+
+    it('should be able to get the referenced item from the new version', function(){
+        repo.add('key', 0, 'test');
+        repo.add(165, 0, 'test');
+        repo.add('party', 0, 'test one');
+        repo.add('brass monkey', 0, 'testy');
+
+        repo.cloneVersionToVersion(0,13);
+
+        var val = repo.get('brass monkey', 13);
+        val.should.equal('testy');
+    });
+
+    it('should be able to get the updated and old item', function(){
+        repo.add('key', 0, 'test');
+        repo.add(165, 0, 'test');
+        repo.add('party', 0, 'test one');
+        repo.add('brass monkey', 0, 'testy');
+
+        repo.cloneVersionToVersion(0,13);
+        repo.add('brass monkey', 13, 'new testy');
+
+        var second = repo.get('brass monkey', 13);
+        second.should.equal('new testy');
+
+        var first = repo.get('brass monkey', 0);
+        first.should.equal('testy');
+    });
+
+    it('should be able to get the item after the original version was removed', function(){
+        repo.add('key', 0, 'test');
+        repo.add(165, 0, 'test');
+        repo.add('party', 0, 'test one');
+        repo.add('brass monkey', 0, 'testy');
+
+        repo.cloneVersionToVersion(0,13);
+
+        repo.remove('brass monkey', 0);
+
+        var second = repo.get('brass monkey', 13);
+        second.should.equal('testy');
+    });
+
     var repo;
     beforeEach(function(){
         repo = new Repository();
