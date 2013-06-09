@@ -16,7 +16,7 @@ describe('When using an AntFarm', function(){
         farm._currentVersion.should.not.equal(newVersion);
     });
 
-    it('should add a node the the new node graph', function(){
+    it('should add a node to the new node graph', function(){
         var farm = new AntFarm();
 
         var version = farm._currentVersion;
@@ -28,6 +28,20 @@ describe('When using an AntFarm', function(){
         var result = fn.call(this, 'test');
 
         result.should.equal('test');
+    });
+
+    it('should remove a node from the new node graph', function(){
+        var farm = new AntFarm();
+
+        var version = farm._currentVersion;
+        farm.addNode('a', function(p){ return p; });
+        var newVersion = farm._currentVersion;
+
+        farm._currentVersion.should.not.equal(version);
+
+        farm.removeNode('a');
+
+        farm._currentVersion.should.not.equal(newVersion);
     });
 
     it('should remove a node from the current graph and update the version', function(){
