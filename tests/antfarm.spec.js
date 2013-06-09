@@ -40,13 +40,11 @@ describe('When using an AntFarm', function(){
 
         result.should.equal('test');
 
-        var v = farm._currentVersion;
-        should.exist(farm._nodeRepo.get('a', farm._currentVersion));
-        farm.removeNode('a');
-        should.not.exist(farm._nodeRepo.get('a', farm._currentVersion));
-        v.should.not.equal(farm._currentVersion);
-    });
+        farm.addNode('b', function(p,c){return p*c;})
 
-    it('')
+        var versions = farm._nodeRepo.getVersions();
+        versions.length.should.equal(1);
+        versions.should.include('2');
+    });
 
 });

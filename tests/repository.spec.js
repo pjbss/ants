@@ -107,6 +107,24 @@ describe('A Repository', function(){
         second.should.equal('testy');
     });
 
+    it('should return if there is no version to clone', function(){
+       repo.cloneVersionToVersion(0,13);
+    });
+
+    it('should be able to remove a version', function(){
+        repo.add('key', 0, 'test');
+        repo.add(165, 0, 'test');
+        repo.add('party', 0, 'test one');
+        repo.add('brass monkey', 0, 'testy');
+
+        repo.cloneVersionToVersion(0,13);
+
+        repo.removeVersion(0);
+
+        var second = repo.get('brass monkey', 13);
+        second.should.equal('testy');
+    });
+
     var repo;
     beforeEach(function(){
         repo = new Repository();
