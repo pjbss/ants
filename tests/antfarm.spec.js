@@ -16,7 +16,20 @@ describe('When using an AntFarm', function(){
         farm._currentVersion.should.not.equal(newVersion);
     });
 
-    it('should add a node to the new node graph', function(){
+    it('should update version number when connecting nodes', function(){
+        var farm = new AntFarm();
+
+        var version = farm._currentVersion;
+        farm.connect('a','b');
+        var newVersion = farm._currentVersion;
+        farm.connect('b', 'c');
+        newVersion.should.not.equal(version);
+
+        farm._currentVersion.should.not.equal(version);
+        farm._currentVersion.should.not.equal(newVersion);
+    });
+
+    it('should update version number when adding a node to the new nodes', function(){
         var farm = new AntFarm();
 
         var version = farm._currentVersion;
@@ -30,7 +43,7 @@ describe('When using an AntFarm', function(){
         result.should.equal('test');
     });
 
-    it('should remove a node from the new node graph', function(){
+    it('should update version number when removing a node from the new nodes', function(){
         var farm = new AntFarm();
 
         var version = farm._currentVersion;
@@ -44,10 +57,25 @@ describe('When using an AntFarm', function(){
         farm._currentVersion.should.not.equal(newVersion);
     });
 
-    it('should remove a node from the current graph and update the version', function(){
+    it('should update version number when removing a connection from the new dag', function(){
+        var farm = new AntFarm();
+
+        var version = farm._currentVersion;
+        farm.connect('a', 'b');
+        var newVersion = farm._currentVersion;
+
+        farm._currentVersion.should.not.equal(version);
+
+        farm.disconnect('a', 'b');
+
+        farm._currentVersion.should.not.equal(newVersion);
+    });
+
+    it('should update version number when removing a node from the nodes and update the version', function(){
         var farm = new AntFarm();
 
         farm.addNode('a', function(p){ return p; });
+        farm.connect('a', 'b');
 
         var fn = farm._nodeRepo.get('a', farm._currentVersion);
         var result = fn.call(this, 'test');
@@ -55,10 +83,15 @@ describe('When using an AntFarm', function(){
         result.should.equal('test');
 
         farm.addNode('b', function(p,c){return p*c;})
+        farm.connect('b', 'c');
 
-        var versions = farm._nodeRepo.getVersions();
-        versions.length.should.equal(1);
-        versions.should.include('2');
+        var nodeVersions = farm._nodeRepo.getVersions();
+        nodeVersions.length.should.equal(1);
+        nodeVersions.should.include('4');
+
+        var dagVersions = farm._dagRepo.getVersions();
+        dagVersions.length.should.equal(1);
+        dagVersions.should.include('4');
     });
 
 });
