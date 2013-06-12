@@ -94,4 +94,28 @@ describe('When using an AntFarm', function(){
         dagVersions.should.include('4');
     });
 
+    it('should have the correct current version of nodes and dag', function(){
+        var farm = new AntFarm();
+
+        farm.addNode('a', function(p){ return p; });
+        farm.connect('a', 'b');
+        farm.addNode('b', function(p,c){return p*c;})
+        farm.connect('b', 'c');
+
+        var a = farm._nodeRepo.get('a', farm._currentVersion);
+        var aResult = a.call(this, 'test');
+        var b = farm._nodeRepo.get('b', farm._currentVersion);
+        var bResult = b.call(this, 2,4);
+
+        var dag = farm._dagRepo.get('dag', farm._currentVersion);
+        var dagKeys = Object.keys(dag._edges);
+        dagKeys.should.include('a');
+        dagKeys.should.include('b');
+        dagKeys.should.include('c');
+
+        var dagParents = Object.keys(dag._parents);
+        dagParents.should.include('b');
+        dagParents.should.include('c');
+    });
+
 });
