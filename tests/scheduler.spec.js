@@ -136,6 +136,6 @@ describe('A Scheduler', function(){
     beforeEach(function(){
         dagRepo = new Repo();
         nodeRepo = new Repo();
-        scheduler = new Scheduler(dagRepo,nodeRepo);
+        scheduler = new Scheduler(dagRepo,nodeRepo,'graph');
     });
 });
