@@ -11,6 +11,24 @@ describe('A Scheduler', function(){
         }).should.throw();
     });
 
+    it('should call the node in a single node graph', function(done){
+        var result = '';
+        var node = function(packet){
+            result = packet;
+            return packet;
+        };
+
+        var graph = new DAG();
+        dagRepo.add('graph', 0, graph);
+
+        nodeRepo.add('b', 0, node);
+
+        scheduler.sendPacket('test', 0, function(){
+            result.should.equal('test');
+            done();
+        }, {});
+    });
+
     it('should call the second node in a two node graph', function(done){
         var result = '';
         var first = function(packet){
