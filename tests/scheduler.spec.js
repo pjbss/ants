@@ -11,7 +11,7 @@ describe('A Scheduler', function(){
         }).should.throw();
     });
 
-    it('should call the node in a single node graph', function(done){
+    it('should throw an error when there are no nodes in the graph', function(){
         var result = '';
         var node = function(packet){
             result = packet;
@@ -23,10 +23,9 @@ describe('A Scheduler', function(){
 
         nodeRepo.add('b', 0, node);
 
-        scheduler.sendPacket('test', 0, function(){
-            result.should.equal('test');
-            done();
-        }, {});
+        (function(){
+            scheduler.sendPacket('message', 0, {}, {});
+        }).should.throw();
     });
 
     it('should call the second node in a two node graph', function(done){
