@@ -1,6 +1,6 @@
 var http = require('http');
 var url = require('url');
-var Ants = require('ants');
+var Ants = require('../../lib/AntFarm');
 
 var farm = new Ants();
 
