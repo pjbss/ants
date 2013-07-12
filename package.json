@@ -1,14 +1,20 @@
 {
     "name" : "ants",
-    "description" : "an exploration into flow based programming",
-    "main" : "package.js",
+    "version" : "0.0.1-alpha",
+    "description" : "An exploration into flow based programming.",
+    "keywords" : "Flow Based Programming",
+    "license" : "MIT",
+    "main" : "./lib/AntFarm",
+    "bugs" : {
+        "url" : "https://github.com/onethreelabs/ants/issues",
+        "email" : "onethreelabs+antsbugs@gmail.com"
+    },
     "author" :
     {
         "name" : "Patrick Sexton",
         "email" : "onethreelabs@gmail.com",
         "url" : "http://www.onethreelabs.com"
     },
-    "version" : "0.0.1",
     "repository" :
     {
         "type" : "git",
@@ -21,7 +27,6 @@
     "devDependencies":
     {
         "mocha": "~1.7.4",
-        "should": "~1.2.1",
-        "node-inspector": "*"
+        "should": "~1.2.1"
     }
 }

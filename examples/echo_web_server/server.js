@@ -1,8 +1,8 @@
 var http = require('http');
 var url = require('url');
-var AntFarm = require('../../lib/AntFarm');
+var Ants = require('ants');
 
-var farm = new AntFarm();
+var farm = new Ants();
 
 farm.addNode('a', function(p){
     var url_parts = url.parse(p, true);
@@ -20,4 +20,5 @@ http.createServer(function (req, res) {
         res.end(endPacket + '\n');
     }, {});
 }).listen(1337, '127.0.0.1');
+
 console.log('Server running at http://127.0.0.1:1337/');
