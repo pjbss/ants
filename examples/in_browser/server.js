@@ -12,7 +12,6 @@ farm.addNode('a', function(p){
 farm.addNode('b', function(p){
     return 'No ' + p + ' For YOU!!!';
 });
-
 farm.connect('a', 'b');
 
 http.createServer(function (req, res) {

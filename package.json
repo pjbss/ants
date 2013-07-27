@@ -26,7 +26,8 @@
     },
     "devDependencies":
     {
-        "mocha": "~1.7.4",
-        "should": "~1.2.1"
+        "mocha": ">=1.7.4",
+        "should": ">=1.2.1",
+        "node-static": ">=0.7.0"
     }
 }
