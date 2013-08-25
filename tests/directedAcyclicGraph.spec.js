@@ -34,7 +34,7 @@ describe('A Directed Acyclic Graph', function(){
         graph.incomingEdges('d').should.include('c');
     });
 
-    it('should be alb to remove an edge', function(){
+    it('should be able to remove an edge', function(){
         graph.connect('a', 'b')
             .connect('a', 'z')
             .disconnect('a', 'b');

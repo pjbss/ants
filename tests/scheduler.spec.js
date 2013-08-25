@@ -1,6 +1,5 @@
 var should = require('should');
-var Repo = require('../lib/Repository');
-var DAG = require('../lib/DirectedAcyclicGraph')
+var DataFlow = require('../lib/DataFlow');
 var Scheduler = require('../lib/Scheduler')
 
 describe('A Scheduler', function(){
@@ -18,10 +17,7 @@ describe('A Scheduler', function(){
             return packet;
         };
 
-        var graph = new DAG();
-        dagRepo.add('graph', 0, graph);
-
-        nodeRepo.add('b', 0, node);
+        flow.addNode('b', node);
 
         (function(){
             scheduler.sendPacket('message', 0, {}, {});
@@ -38,14 +34,11 @@ describe('A Scheduler', function(){
             return packet;
         };
 
-        var graph = new DAG();
-        graph.connect('a', 'b');
-        dagRepo.add('graph', 0, graph);
+        flow.addNode('a', first);
+        flow.addNode('b', node);
+        flow.connect('a', 'b');
 
-        nodeRepo.add('a', 0, first);
-        nodeRepo.add('b', 0, node);
-
-        scheduler.sendPacket('test', 0, function(){
+        scheduler.sendPacket('test', flow.currentVersion(), function(){
             result.should.equal('test');
             done();
         }, {});
@@ -69,19 +62,17 @@ describe('A Scheduler', function(){
             return result;
         };
 
-        var graph = new DAG();
-        graph.connect('a', 'b');
-        graph.connect('a', 'c');
-        graph.connect('c', 'x');
-        graph.connect('b', 'x');
-        dagRepo.add('graph', 0, graph);
+        flow.connect('a', 'b');
+        flow.connect('a', 'c');
+        flow.connect('c', 'x');
+        flow.connect('b', 'x');
 
-        nodeRepo.add('a', 0, fastNode);
-        nodeRepo.add('b', 0, fastNode);
-        nodeRepo.add('c', 0, slowNode);
-        nodeRepo.add('x', 0, lastNode);
+        flow.addNode('a', fastNode);
+        flow.addNode('b', fastNode);
+        flow.addNode('c', slowNode);
+        flow.addNode('x', lastNode);
 
-        scheduler.sendPacket('test', 0, function(packet){
+        scheduler.sendPacket('test', flow.currentVersion(), function(packet){
             packet.should.equal('1000000 test');
             done();
         }, {});
@@ -105,54 +96,35 @@ describe('A Scheduler', function(){
             return result;
         };
 
-        var graph = new DAG();
-        graph.connect('a', 'b');
-        graph.connect('a', 'c');
-        graph.connect('c', 'x');
-        graph.connect('b', 'x');
-        dagRepo.add('graph', 0, graph);
+        flow.connect('a', 'b');
+        flow.connect('a', 'c');
+        flow.connect('c', 'x');
+        flow.connect('b', 'x');
 
-        var graph = new DAG();
-        graph.connect('a', 'b');
-        graph.connect('a', 'c');
-        graph.connect('c', 'x');
-        graph.connect('b', 'x');
-        dagRepo.add('graph', 1, graph);
+        flow.addNode('a', fastNode);
+        flow.addNode('b', fastNode);
+        flow.addNode('c', slowNode);
+        flow.addNode('x', lastNode);
 
-        nodeRepo.add('a', 0, fastNode);
-        nodeRepo.add('b', 0, fastNode);
-        nodeRepo.add('c', 0, slowNode);
-        nodeRepo.add('x', 0, lastNode);
-
-        nodeRepo.add('a', 1, fastNode);
-        nodeRepo.add('b', 1, fastNode);
-        nodeRepo.add('c', 1, slowNode);
-        nodeRepo.add('x', 1, lastNode);
-
-        scheduler.sendPacket('test', 0, function(result){
+        scheduler.sendPacket('test', flow.currentVersion(), function(result){
             return;
         }, {});
 
-        scheduler.activeVersions().length.should.equal(1);
-        scheduler.activeVersions().should.include('0');
+        flow.addNode('a', fastNode);
 
-        scheduler.sendPacket('test', 1, function(result){
+        scheduler.sendPacket('test', flow.currentVersion(), function(result){
             done();
         }, {});
 
         scheduler.activeVersions().length.should.equal(2);
-        scheduler.activeVersions().should.include('0');
-        scheduler.activeVersions().should.include('1');
 
         killIt = true;
     });
 
-    var nodeRepo;
-    var dagRepo;
+    var flow;
     var scheduler;
     beforeEach(function(){
-        dagRepo = new Repo();
-        nodeRepo = new Repo();
-        scheduler = new Scheduler(dagRepo,nodeRepo,'graph');
+        flow = new DataFlow();
+        scheduler = new Scheduler(flow);
     });
 });
