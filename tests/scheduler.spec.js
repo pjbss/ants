@@ -6,7 +6,7 @@ describe('A Scheduler', function(){
 
     it('should throw error when there is no graph for the specified version', function(){
         (function(){
-            scheduler.sendPacket('message', 0, {}, {});
+            scheduler.sendPacket('message', {}, {});
         }).should.throw();
     });
 
@@ -20,7 +20,7 @@ describe('A Scheduler', function(){
         flow.addNode('b', node);
 
         (function(){
-            scheduler.sendPacket('message', 0, {}, {});
+            scheduler.sendPacket('message', {}, {});
         }).should.throw();
     });
 
@@ -38,7 +38,7 @@ describe('A Scheduler', function(){
         flow.addNode('b', node);
         flow.connect('a', 'b');
 
-        scheduler.sendPacket('test', flow.currentVersion(), function(){
+        scheduler.sendPacket('test', function(){
             result.should.equal('test');
             done();
         }, {});
@@ -72,7 +72,7 @@ describe('A Scheduler', function(){
         flow.addNode('c', slowNode);
         flow.addNode('x', lastNode);
 
-        scheduler.sendPacket('test', flow.currentVersion(), function(packet){
+        scheduler.sendPacket('test', function(packet){
             packet.should.equal('1000000 test');
             done();
         }, {});
@@ -106,19 +106,53 @@ describe('A Scheduler', function(){
         flow.addNode('c', slowNode);
         flow.addNode('x', lastNode);
 
-        scheduler.sendPacket('test', flow.currentVersion(), function(result){
+        scheduler.sendPacket('test', function(result){
             return;
         }, {});
 
         flow.addNode('a', fastNode);
 
-        scheduler.sendPacket('test', flow.currentVersion(), function(result){
+        scheduler.sendPacket('test', function(result){
             done();
         }, {});
 
         scheduler.activeVersions().length.should.equal(2);
 
         killIt = true;
+    });
+
+    it('should be able to order the inputs', function(done){
+        var fastNode = function(packet){
+            return packet;
+        };
+        var slowNode = function(packet){
+            var loop = 1000000;
+            var val = 0;
+            for(var i=0; i<loop; i++){
+                val += 1;
+            }
+
+            return val;
+        };
+        var lastNode = function(one, two){
+            var result = one + ' ' + two;
+            return result;
+        };
+
+        flow.connect('a', 'b');
+        flow.connect('a', 'c');
+        flow.connect('c', 'x', 2);
+        flow.connect('b', 'x', 1);
+
+        flow.addNode('a', fastNode);
+        flow.addNode('b', fastNode);
+        flow.addNode('c', slowNode);
+        flow.addNode('x', lastNode);
+
+        scheduler.sendPacket('test', function(packet){
+            packet.should.equal('test 1000000');
+            done();
+        }, {});
     });
 
     var flow;

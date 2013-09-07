@@ -100,7 +100,7 @@ describe('When using a DataFlow', function(){
 
         flow.addNode('a', function(p){ return p; });
         flow.connect('a', 'b');
-        flow.addNode('b', function(p,c){return p*c;})
+        flow.addNode('b', function(p,c){return p*c;});
         flow.connect('b', 'c');
 
         var a = flow._nodeRepo.get('a', flow._currentVersion);
@@ -117,5 +117,28 @@ describe('When using a DataFlow', function(){
         var dagParents = Object.keys(dag._parents);
         dagParents.should.include('b');
         dagParents.should.include('c');
+    });
+
+    it('should be able to order the inputs', function(){
+        var flow = new DataFlow();
+
+        flow.addNode('a', function(p){ return p; });
+        flow.addNode('b', function(p,c){return p*c;});
+        flow.addNode('c', function(one, two){ return one*two; });
+
+        flow.connect('a', 'b');
+        flow.connect('b', 'c', 2);
+        flow.connect('a', 'c', 1);
+        flow.connect('a', 'c', 3);
+
+        var mappings = flow._dagRepo.get(flow._mappingKey, flow._currentVersion);
+        var keys = Object.keys(mappings);
+        keys.length.should.equal(1);
+
+        mappings['c'].length.should.equal(2);
+        mappings['c'][0].from.should.equal('a');
+        mappings['c'][0].order.should.equal(3);
+        mappings['c'][1].from.should.equal('b');
+        mappings['c'][1].order.should.equal(2);
     });
 });
