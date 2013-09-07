@@ -2,7 +2,7 @@
     "name" : "ants",
     "version" : "0.0.1-alpha",
     "description" : "An exploration into flow based programming.",
-    "keywords" : "Flow Based Programming",
+    "keywords" : ["Flow Based Programming"],
     "license" : "MIT",
     "main" : "./lib/AntFarm",
     "bugs" : {
