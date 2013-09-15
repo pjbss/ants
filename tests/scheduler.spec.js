@@ -141,8 +141,8 @@ describe('A Scheduler', function(){
 
         flow.connect('a', 'b');
         flow.connect('a', 'c');
-        flow.connect('c', 'x', 2);
-        flow.connect('b', 'x', 1);
+        flow.connect('c', 'x').order(2);
+        flow.connect('b', 'x').order(1);
 
         flow.addNode('a', fastNode);
         flow.addNode('b', fastNode);
@@ -151,6 +151,30 @@ describe('A Scheduler', function(){
 
         scheduler.sendPacket('test', function(packet){
             packet.should.equal('test 1000000');
+            done();
+        }, {});
+    });
+
+    it('should be able to use conditionals', function(done){
+        var double = function(p){
+            return p*2;
+        };
+        var passThrough = function(p){
+            return p;
+        };
+        var addTen = function(p){
+            return p + 10;
+        };
+
+        flow.connect('a', 'b').if(function(p) { return p <= 5;});
+        flow.connect('a', 'c').if(function(p) { return p > 5;});
+
+        flow.addNode('a', passThrough);
+        flow.addNode('b', double);
+        flow.addNode('c', addTen);
+
+        scheduler.sendPacket(6, function(packet){
+            packet.should.equal(16);
             done();
         }, {});
     });

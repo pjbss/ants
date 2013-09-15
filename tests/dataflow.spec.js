@@ -127,9 +127,9 @@ describe('When using a DataFlow', function(){
         flow.addNode('c', function(one, two){ return one*two; });
 
         flow.connect('a', 'b');
-        flow.connect('b', 'c', 2);
-        flow.connect('a', 'c', 1);
-        flow.connect('a', 'c', 3);
+        flow.connect('b', 'c').order(2);
+        flow.connect('a', 'c').order(1);
+        flow.connect('a', 'c').order(3);
 
         var mappings = flow._dagRepo.get(flow._mappingKey, flow._currentVersion);
         var keys = Object.keys(mappings);
@@ -140,5 +140,33 @@ describe('When using a DataFlow', function(){
         mappings['c'][0].order.should.equal(3);
         mappings['c'][1].from.should.equal('b');
         mappings['c'][1].order.should.equal(2);
+    });
+
+    it('should be able to connect with a condition', function(){
+        var flow = new DataFlow();
+
+        flow.addNode('a', function(p){ return p; });
+        flow.addNode('b', function(p){return p * 2;});
+        flow.addNode('c', function(p){ return p * 4; });
+
+        flow.connect('a', 'b').if(function(p) { return p <= 5; });
+        flow.connect('a', 'c').if(function(p) { return p > 5; });
+
+        var conditions = flow._dagRepo.get(flow._conditionalKey, flow._currentVersion);
+        var keys = Object.keys(conditions);
+        keys.length.should.equal(1);
+
+        keys.should.include('a');
+        conditions['a'].length.should.equal(2);
+        conditions['a'][0].to.should.equal('c');
+        var cFunc = conditions['a'][0].condition;
+        conditions['a'][1].to.should.equal('b');
+        var bFunc = conditions['a'][1].condition;
+
+        var bResult = bFunc(2);
+        bResult.should.equal(true)
+
+        var cResult = cFunc(2);
+        cResult.should.equal(false);
     });
 });
