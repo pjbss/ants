@@ -22,7 +22,8 @@
     },
     "dependencies":
     {
-        "amdefine": ">=0.0.2"
+        "amdefine": ">=0.0.2",
+        "node_utility_belt": ">=0.0.0"
     },
     "devDependencies":
     {
